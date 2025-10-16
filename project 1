@@ -4,6 +4,17 @@ with open("penguins.csv") as csv_file:
 
     for row in csv_file:
         print(row)
+
+    def filter_by_island(csv_file, island_name):
+        data= []
+        with open(csv_file, newline='') as file:
+            reader= csv.DictReader(file)
+            for row in reader:
+                if row ["Island"] == island_name:
+                    filter_by_island.append(row)
+    
+        return filter_by_island
+    
     
     
 print(csv_file)
