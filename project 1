@@ -23,27 +23,55 @@ def filter_by_species(csv_file, species_name):
             if row ["species"] == species_name:
                 data.append(row)
     return data
+
+def filter_by_sex(csv_file):
+    data= []
+    with open(csv_file, newline='') as file:
+        reader= csv.DictReader(file)
+        for row in reader:
+            if row ["sex"] == "Female":
+                data.append(row)
+    return data
     
-def calculate_flipper_percentage(csv_file, island_name, threshold=190):
+def calculate_flipper_percentage(csv_file, island_name= "Dream", species_name= "Chinstrap", threshold=190):
     total= 0
     above_threshold= 0 
     with open(csv_file, newline='') as file:
         reader= csv.DictReader(file)
         for row in reader: 
-            if row ["island"]== island_name:
-                flipper_length_mm = row["flipper length (mm)"]
-                if flipper_length_mm:
+            if row ["island"]== island_name and row ["species"]== species_name:
+                flipper_length = row["flipper length (mm)"]
+                if flipper_length:
+                    flipper=  float(flipper_length)
                     total += 1
-                    if float(flipper_length_mm) > threshold:
+                    if flipper > threshold:
                         above_threshold += 1
-                    total += 1
+              
 
     percentage = 0
     if total > 0:
         percentage = round((above_threshold / total) * 100, 2)
         return percentage
+    
+def most_common_female_species(csv_file):
+    count_species= {}
+    with open(csv_file, newline='') as file:
+        reader= csv.DictReader(file)
+        for row in reader:
+            if row ["island"] == "Biscoe" and row["sex"]== "female":
+                species= row["species"]
+                if species in count_species:
+                    count_species[species] += 1
+                else:
+                    count_species[species]=1
 
+    most_common_species= None
+    high_count= 0 
 
-csv_file= "penguins.csv"
+    for species in count_species:
+        if count_species[species] > high_count:
+            high_count = count_species[species]
+            most_common_species= species
 
+    return most_common_species
 
