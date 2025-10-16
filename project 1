@@ -1,20 +1,49 @@
 import csv
-with open("penguins.csv") as csv_file: 
-    csv_reader= csv.reader(csv_file)
+#with open("penguins.csv") as csv_file: 
+    #csv_reader= csv.reader(csv_file)
 
-    for row in csv_file:
-        print(row)
+    #for row in csv_reader:
+        #print(row)
 
-    def filter_by_island(csv_file, island_name):
-        data= []
-        with open(csv_file, newline='') as file:
-            reader= csv.DictReader(file)
-            for row in reader:
-                if row ["Island"] == island_name:
-                    filter_by_island.append(row)
+def filter_by_island(csv_file, island_name):
+    data= []
+    with open(csv_file, newline='') as file:
+        reader= csv.DictReader(file)
+        for row in reader:
+            if row ["island"] == island_name:
+                data.append(row)
     
-        return filter_by_island
+        return data
     
+def filter_by_species(csv_file, species_name):
+    data= []
+    with open(csv_file, newline='') as file:
+        reader= csv.DictReader(file)
+        for row in reader:
+            if row ["species"] == species_name:
+                data.append(row)
+    return data
     
-    
-print(csv_file)
+def calculate_flipper_percentage(csv_file, island_name, threshold=190):
+    total= 0
+    above_threshold= 0 
+    with open(csv_file, newline='') as file:
+        reader= csv.DictReader(file)
+        for row in reader: 
+            if row ["island"]== island_name:
+                flipper_length_mm = row["flipper length (mm)"]
+                if flipper_length_mm:
+                    total += 1
+                    if float(flipper_length_mm) > threshold:
+                        above_threshold += 1
+                    total += 1
+
+    percentage = 0
+    if total > 0:
+        percentage = round((above_threshold / total) * 100, 2)
+        return percentage
+
+
+csv_file= "penguins.csv"
+
+
