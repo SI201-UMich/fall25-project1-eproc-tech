@@ -40,7 +40,11 @@ def calculate_flipper_percentage(csv_file, island_name= "Dream", species_name= "
         reader= csv.DictReader(file)
         for row in reader: 
             if row ["island"]== island_name and row ["species"]== species_name:
-                flipper_length = row["flipper length (mm)"]
+                flipper_length = row["flipper_length_mm"]
+                
+                if not flipper_length or flipper_length == "NA":
+                    continue
+
                 if flipper_length:
                     flipper=  float(flipper_length)
                     total += 1
@@ -51,14 +55,14 @@ def calculate_flipper_percentage(csv_file, island_name= "Dream", species_name= "
     percentage = 0
     if total > 0:
         percentage = round((above_threshold / total) * 100, 2)
-        return percentage
+    return percentage
     
 def most_common_female_species(csv_file):
     count_species= {}
     with open(csv_file, newline='') as file:
         reader= csv.DictReader(file)
         for row in reader:
-            if row ["island"] == "Biscoe" and row["sex"]== "female":
+            if row ["island"] == "Biscoe" and row["sex"]== "Female":
                 species= row["species"]
                 if species in count_species:
                     count_species[species] += 1
@@ -75,3 +79,44 @@ def most_common_female_species(csv_file):
 
     return most_common_species
 
+
+
+
+def test_calculate_flipper_percentage():
+    result = calculate_flipper_percentage("penguins.csv", "Dream", "Chinstrap", 190)
+    assert result == 77.94, f"Expected 77.94 but got {result}"
+
+def test_different_species():
+    result= calculate_flipper_percentage("penguins.csv", "Biscoe", "Adelie", 180)
+    assert result == 88.64, f"Expected 88.64 but got {result}"
+
+def test_no_match():
+    result= calculate_flipper_percentage("penguins.csv", "Torgersen", "Adelie", 210)
+    assert result == 0, f"Expected 0 but got {result}"
+
+def test_all_above_threshold():
+    result= calculate_flipper_percentage("penguins.csv", "Biscoe", "Gentoo", 190)
+    assert result == 100.0, f"Expected 100.0 but got {result}"
+
+
+
+if __name__ == "__main__":
+    test_calculate_flipper_percentage()
+    test_different_species()
+    test_no_match()
+    test_all_above_threshold()
+    print("Pass")
+
+
+def test_filter_female_penguins():
+    result1 = filter_by_sex("penguins.csv", "Adelie")
+    assert len(result1) == 4, f"Expected 4, got {len(result1)}"
+
+    result4 = filter_by_sex("penguins.csv", "Emperor")
+    assert len(result4) == 0, "Expected 0 Emperor females"
+
+
+
+if __name__ == "__main__":
+    result = filter_by_island("penguins.csv", "Dream")
+    print(result[:5])
