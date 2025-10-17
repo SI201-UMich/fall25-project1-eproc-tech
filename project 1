@@ -57,28 +57,30 @@ def calculate_flipper_percentage(csv_file, island_name= "Dream", species_name= "
         percentage = round((above_threshold / total) * 100, 2)
     return percentage
     
-def most_common_female_species(csv_file):
+def most_common_female_species(csv_file, island_name= "Biscoe"):
     count_species= {}
+    island_name_lower= island_name.strip().lower()
     with open(csv_file, newline='') as file:
         reader= csv.DictReader(file)
         for row in reader:
-            if row ["island"] == "Biscoe" and row["sex"]== "Female":
-                species= row["species"]
+            island = row.get("island", "").strip().lower()
+            sex = row.get("sex", "").strip().lower()
+
+            if sex != "female":
+                continue
+            
+            if island == island_name_lower:
+                species = row.get("species", "").strip()
                 if species in count_species:
                     count_species[species] += 1
                 else:
                     count_species[species]=1
+    if not count_species:
+        return None
+     
 
-    most_common_species= None
-    high_count= 0 
-
-    for species in count_species:
-        if count_species[species] > high_count:
-            high_count = count_species[species]
-            most_common_species= species
-
+    most_common_species = max(count_species, key=count_species.get)
     return most_common_species
-
 
 
 
@@ -97,7 +99,25 @@ def test_no_match():
 def test_all_above_threshold():
     result= calculate_flipper_percentage("penguins.csv", "Biscoe", "Gentoo", 190)
     assert result == 100.0, f"Expected 100.0 but got {result}"
+    
 
+
+
+def test_filter_female_penguins():
+    result = most_common_female_species("penguins.csv", "Biscoe")
+    assert result == "Gentoo", f"Expected 'Genrtoo', got {result}"
+
+def test_other_island():
+    result= most_common_female_species("penguins.csv", "Dream")
+    assert result == "Chinstrap", f"Expected 'Chinstrap', got {result}"
+
+def no_penguin_matches():
+    result= most_common_female_species("penguins.csv")
+    assert result is not None, f"Expected a species, but got None"
+
+def test_fake_island():
+    result= most_common_female_species("penguins.csv", "Atlantis")
+    assert result is None, f"Expected None but got {result}"
 
 
 if __name__ == "__main__":
@@ -105,18 +125,8 @@ if __name__ == "__main__":
     test_different_species()
     test_no_match()
     test_all_above_threshold()
+    test_filter_female_penguins()
+    test_other_island()
+    no_penguin_matches()
+    test_fake_island()
     print("Pass")
-
-
-def test_filter_female_penguins():
-    result1 = filter_by_sex("penguins.csv", "Adelie")
-    assert len(result1) == 4, f"Expected 4, got {len(result1)}"
-
-    result4 = filter_by_sex("penguins.csv", "Emperor")
-    assert len(result4) == 0, "Expected 0 Emperor females"
-
-
-
-if __name__ == "__main__":
-    result = filter_by_island("penguins.csv", "Dream")
-    print(result[:5])
