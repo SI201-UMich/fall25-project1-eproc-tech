@@ -44,12 +44,11 @@ def calculate_flipper_percentage(csv_file, island_name= "Dream", species_name= "
                 
                 if not flipper_length or flipper_length == "NA":
                     continue
-
-                if flipper_length:
-                    flipper=  float(flipper_length)
-                    total += 1
-                    if flipper > threshold:
-                        above_threshold += 1
+                    
+                flipper=  float(flipper_length)
+                total += 1
+                if flipper > threshold:
+                    above_threshold += 1
               
 
     percentage = 0
@@ -82,7 +81,7 @@ def most_common_female_species(csv_file, island_name= "Biscoe"):
     most_common_species = max(count_species, key=count_species.get)
     return most_common_species
 
-
+#TESTS
 
 def test_calculate_flipper_percentage():
     result = calculate_flipper_percentage("penguins.csv", "Dream", "Chinstrap", 190)
@@ -105,13 +104,13 @@ def test_all_above_threshold():
 
 def test_filter_female_penguins():
     result = most_common_female_species("penguins.csv", "Biscoe")
-    assert result == "Gentoo", f"Expected 'Genrtoo', got {result}"
+    assert result == "Gentoo", f"Expected 'Gentoo', got {result}"
 
 def test_other_island():
     result= most_common_female_species("penguins.csv", "Dream")
     assert result == "Chinstrap", f"Expected 'Chinstrap', got {result}"
 
-def no_penguin_matches():
+def test_no_penguin_matches():
     result= most_common_female_species("penguins.csv")
     assert result is not None, f"Expected a species, but got None"
 
@@ -120,6 +119,20 @@ def test_fake_island():
     assert result is None, f"Expected None but got {result}"
 
 
+#RESULTS
+def results_csv(filename="penguin_results.csv"):
+    results = [
+        ["Description", "Value"],
+        ["Most common female species on Biscoe", most_common_female_species("penguins.csv", "Biscoe")],
+        ["Dream Chinstrap flipper > 190 (%)", f"{calculate_flipper_percentage('penguins.csv', 'Dream', 'Chinstrap', 190)}%"],
+    ]
+
+    with open(filename, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(results)
+
+    print(f"Results written to {filename}")
+
 if __name__ == "__main__":
     test_calculate_flipper_percentage()
     test_different_species()
@@ -127,6 +140,7 @@ if __name__ == "__main__":
     test_all_above_threshold()
     test_filter_female_penguins()
     test_other_island()
-    no_penguin_matches()
+    test_no_penguin_matches()
     test_fake_island()
+    results_csv()
     print("Pass")
